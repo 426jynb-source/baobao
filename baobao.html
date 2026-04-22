@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天下最好的宝宝</title>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background: #fff0f5;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'ZCOOL XiaoWei', serif;
+  }
+
+  /* Background gradient pulse */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 40%, #ffd6e7 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 60%, #ffb3d1 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, #fff0f5 0%, #ffe4f0 100%);
+    animation: bgPulse 5s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+
+  @keyframes bgPulse {
+    from { opacity: 0.8; }
+    to   { opacity: 1; }
+  }
+
+  /* Main text */
+  .main {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    animation: fadeIn 1.5s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .title {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: clamp(3rem, 12vw, 8rem);
+    color: #e8336d;
+    text-shadow:
+      0 4px 20px rgba(232, 51, 109, 0.3),
+      0 0 60px rgba(255, 150, 180, 0.2);
+    line-height: 1.2;
+    letter-spacing: 0.05em;
+    animation: titlePulse 3s ease-in-out infinite;
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { text-shadow: 0 4px 20px rgba(232,51,109,0.3), 0 0 60px rgba(255,150,180,0.2); }
+    50%       { text-shadow: 0 4px 30px rgba(232,51,109,0.6), 0 0 100px rgba(255,100,150,0.4); }
+  }
+
+  .subtitle {
+    margin-top: 1rem;
+    font-size: clamp(1rem, 3vw, 1.6rem);
+    color: #f472a8;
+    letter-spacing: 0.3em;
+    opacity: 0;
+    animation: fadeIn 1.5s ease 0.8s forwards;
+  }
+
+  /* Floating hearts canvas */
+  canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* Click sparkle */
+  .sparkle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 20;
+    font-size: 1.5rem;
+    animation: sparkleAnim 0.8s ease forwards;
+  }
+
+  @keyframes sparkleAnim {
+    0%   { opacity: 1; transform: scale(0.5) translateY(0); }
+    100% { opacity: 0; transform: scale(1.5) translateY(-40px); }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="hearts"></canvas>
+
+<div class="main">
+  <div class="title">天下最好的宝宝</div>
+  <div class="subtitle">✨ 独一无二 ✨</div>
+</div>
+
+<script>
+const canvas = document.getElementById('hearts');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// Heart drawing function
+function drawHeart(ctx, x, y, size, color, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x, y + size * 0.3);
+  ctx.bezierCurveTo(x, y, x - size, y, x - size, y + size * 0.4);
+  ctx.bezierCurveTo(x - size, y + size * 0.8, x, y + size * 1.1, x, y + size * 1.4);
+  ctx.bezierCurveTo(x, y + size * 1.1, x + size, y + size * 0.8, x + size, y + size * 0.4);
+  ctx.bezierCurveTo(x + size, y, x, y, x, y + size * 0.3);
+  ctx.fill();
+  ctx.restore();
+}
+
+const colors = [
+  '#ff6b9d', '#ff4d7e', '#ff85b3', '#ffadd2',
+  '#e8336d', '#ff1a6b', '#ffcce0', '#ff3388'
+];
+
+// Create hearts
+const hearts = Array.from({ length: 35 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height + canvas.height,
+  size: Math.random() * 14 + 6,
+  speed: Math.random() * 1.2 + 0.4,
+  drift: (Math.random() - 0.5) * 0.6,
+  alpha: Math.random() * 0.5 + 0.2,
+  color: colors[Math.floor(Math.random() * colors.length)],
+  sway: Math.random() * Math.PI * 2,
+  swaySpeed: Math.random() * 0.02 + 0.01,
+}));
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  hearts.forEach(h => {
+    h.y -= h.speed;
+    h.sway += h.swaySpeed;
+    h.x += Math.sin(h.sway) * 0.8 + h.drift;
+    if (h.y + h.size * 1.5 < 0) {
+      h.y = canvas.height + h.size * 2;
+      h.x = Math.random() * canvas.width;
+    }
+    drawHeart(ctx, h.x, h.y, h.size, h.color, h.alpha);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Click to spawn hearts
+document.addEventListener('click', e => {
+  const el = document.createElement('div');
+  el.className = 'sparkle';
+  el.textContent = ['💕','❤️','💗','💖','💝'][Math.floor(Math.random()*5)];
+  el.style.left = (e.clientX - 12) + 'px';
+  el.style.top  = (e.clientY - 12) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 800);
+
+  // also add burst hearts to canvas
+  for (let i = 0; i < 5; i++) {
+    hearts.push({
+      x: e.clientX,
+      y: e.clientY,
+      size: Math.random() * 12 + 5,
+      speed: Math.random() * 2 + 1,
+      drift: (Math.random() - 0.5) * 1.5,
+      alpha: Math.random() * 0.6 + 0.3,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      sway: Math.random() * Math.PI * 2,
+      swaySpeed: Math.random() * 0.03 + 0.01,
+    });
+    if (hearts.length > 80) hearts.splice(0, 5);
+  }
+});
+</script>
+</body>
+</html>
